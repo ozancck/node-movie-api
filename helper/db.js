@@ -8,6 +8,8 @@ module.exports =()=>{
     })
 
     mongoose.connection.on('error', (err)=>{
-        console.log("Mongoose Connected ",err)
+        console.log("Mongoose not Connected ",err)
     })
+
+    mongoose.Promise=global.Promise
 }
