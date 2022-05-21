@@ -11,8 +11,58 @@ router.post('/', (req, res, next) => {
     promise.then((data) => {
         res.json(data)
     }).catch((err) => {
-        res.json(data)
+        res.json(err)
     });
 });
+
+
+router.get("/", (req,res)=>{
+    const promise = Director.aggregate([
+        {
+            $lookup:
+                {
+                    from: "movies",
+                    localField: "_id",
+                    foreignField: "director_id",
+                    as: "movies"
+                }
+        },
+        {
+            $unwind:{
+                path: "$movies",
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    _id: "$_id",
+                    name: "$name",
+                    surname: "$surname",
+                    bio: "$bio",
+                },
+                movies:{
+                    $push: "$movies"
+                }
+            }
+        },
+        {
+            $project:{
+                _id: "$_id._id",
+                name: "$_id.name",
+                surname:"$_id.surname",
+                bio: "$_id.bio",
+                movies: "$movies"
+            }
+        }
+    ])
+
+    promise .then((result) => {
+        res.json(result)
+    }).catch((err) => {
+        res.json(err)
+    });
+
+})
 
 module.exports = router;
